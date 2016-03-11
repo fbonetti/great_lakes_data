@@ -4,6 +4,12 @@ STATIONS = [
     name: 'Chicago',
     latitude: 41.92,
     longitude: -87.6
+  },
+  {
+    id: 8,
+    name: 'South Haven',
+    latitude: 42.401384,
+    longitude: -86.288018
   }
 ]
 

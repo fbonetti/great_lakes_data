@@ -11,12 +11,12 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160311032633) do
+ActiveRecord::Schema.define(version: 20160311164847) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
-  create_table "readings", force: :cascade do |t|
+  create_table "readings", id: false, force: :cascade do |t|
     t.integer  "station_id",     null: false
     t.datetime "timestamp"
     t.float    "air_temp"
@@ -25,6 +25,7 @@ ActiveRecord::Schema.define(version: 20160311032633) do
     t.integer  "wind_direction"
   end
 
+  add_index "readings", ["station_id", "timestamp"], name: "index_readings_on_station_id_and_timestamp", unique: true, using: :btree
   add_index "readings", ["station_id"], name: "index_readings_on_station_id", using: :btree
 
   create_table "stations", force: :cascade do |t|
