@@ -5,13 +5,17 @@ class ReadingsController < ApplicationController
   def search
     sql = "
       SELECT to_char(timestamp, 'HH24MI') as hour_minute, avg(wind_speed) * 1.94384 as avg_knots
-      FROM wind_speeds
+      FROM readings
       WHERE EXTRACT(MONTH FROM timestamp) BETWEEN 5 AND 9
       GROUP BY hour_minute
       ORDER BY hour_minute
-    ")
+    "
+
+    results = select_rows(sql).map do |row|
+      [row[0], row[1].to_f]
+    end
     
-    render json: execute(sql)
+    render json: results
   end
 
   private
@@ -20,7 +24,7 @@ class ReadingsController < ApplicationController
     ActiveRecord::Base.send(:sanitize_sql, [sql, values], '')
   end
 
-  def execute(sql, values = {})
-    ActiveRecord::Base.connection.execute(sanitize_sql(sql, values)).entries
+  def select_rows(sql, values = {})
+    ActiveRecord::Base.connection.select_rows(sanitize_sql(sql, values)).entries
   end
 end
