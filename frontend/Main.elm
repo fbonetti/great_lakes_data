@@ -74,7 +74,7 @@ requestData model =
 
 readingsUrl : Model -> String
 readingsUrl model =
-  url "/readings/search"
+  url "/readings/daily_average"
     [ ("station_id", (toString model.stationId))
     ]
 
