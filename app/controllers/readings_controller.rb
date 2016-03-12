@@ -4,14 +4,15 @@ class ReadingsController < ApplicationController
 
   def search
     sql = "
-      SELECT to_char(timestamp, 'HH24MI') as hour_minute, avg(wind_speed) * 1.94384 as avg_knots
+      SELECT to_char(timestamp, 'YYYY-MM-DD') as date, avg(wind_speed) * 1.94384 as avg_knots
       FROM readings
       WHERE EXTRACT(MONTH FROM timestamp) BETWEEN 5 AND 9
-      GROUP BY hour_minute
-      ORDER BY hour_minute
+      AND station_id = :station_id
+      GROUP BY date
+      ORDER BY date
     "
 
-    results = select_rows(sql).map do |row|
+    results = select_rows(sql, station_id: params[:station_id]).map do |row|
       [row[0], row[1].to_f]
     end
     
