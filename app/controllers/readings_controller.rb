@@ -3,7 +3,11 @@ class ReadingsController < ApplicationController
     stations = Station.all.map do |station|
       station.attributes.slice('id', 'name', 'latitude', 'longitude')
     end
-    @elm_data = { stations: stations }
+    @elm_data = {
+      stations: stations,
+      startDate: "2015-01-01",
+      endDate: "2015-12-31"
+    }
   end
 
   def daily_average

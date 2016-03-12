@@ -1,5 +1,5 @@
 import StartApp
-import Html exposing (Html, Attribute, div, text, input, select, option, button, span)
+import Html exposing (Html, Attribute, div, text, input, select, option, button, span, label)
 import Html.Attributes exposing (class, type', value, selected, id)
 import Html.Events exposing (on, targetValue, onClick)
 import Json.Decode
@@ -22,7 +22,10 @@ app =
     { init = (initModel, requestData initModel)
     , view = view
     , update = update
-    , inputs = []
+    , inputs =
+        [ Signal.map SetStartDate startDate
+        , Signal.map SetEndDate endDate
+        ]
     }
 
 port tasks : Signal (Task Never ())
@@ -34,6 +37,8 @@ port data =
   Signal.map .data app.model
 
 port stations : List Station
+port startDate : Signal String
+port endDate : Signal String
 
 -- MODEL
 
@@ -70,6 +75,7 @@ initModel =
 type Action
     = SetStationId Int
     | SetStartDate String
+    | SetEndDate String
     | ReceiveData (List Point)
     | CloseAlert
     | SetErrorMessage String
@@ -82,7 +88,11 @@ update action model =
       let model' = { model | stationId = id, loading = True }
       in (model', requestData model')
     SetStartDate date ->
-      noEffects { model | startDate = date }
+      let model' = { model | startDate = date }
+      in (model', requestData model')
+    SetEndDate date ->
+      let model' = { model | endDate = date }
+      in (model', requestData model')
     ReceiveData data ->
       noEffects { model | data = data, loading = False }
     CloseAlert ->
@@ -160,17 +170,26 @@ view address model =
   [ div [ class "row" ]
     [ div [ class "col-sm-8" ]
       [ errorAlert address model
-      , div []
-        [ text ("Station ID: " ++ (toString model.stationId)) ]
       , div [ id "chart" ] []
       ]
     , div [ class "col-sm-4" ]
-      [ select
-        [ onChangeInt address SetStationId
-        , value (toString model.stationId)
-        , class "form-control"
+      [ div [ class "form-group" ]
+        [ label [] [ text "Station" ]
+        , select
+          [ onChangeInt address SetStationId
+          , value (toString model.stationId)
+          , class "form-control"
+          ]
+          (List.map (stationOption model) stations)
         ]
-        (List.map (stationOption model) stations)
+      , div [ class "form-group" ]
+        [ label [] [ text "Start Date" ]
+        , input [ id "startDatePicker", type' "text", class "form-control", value model.startDate ] []
+        ]
+      , div [ class "form-group" ]
+        [ label [] [ text "End Date" ]
+        , input [ id "endDatePicker", type' "text", class "form-control", value model.endDate ] []
+        ]
       ]
     ]
   ]
