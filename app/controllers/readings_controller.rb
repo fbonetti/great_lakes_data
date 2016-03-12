@@ -1,19 +1,25 @@
 class ReadingsController < ApplicationController
   def index
+    stations = Station.all.map do |station|
+      station.attributes.slice('id', 'name', 'latitude', 'longitude')
+    end
+    @elm_data = { stations: stations }
   end
 
   def daily_average
     sql = "
-      SELECT to_char(timestamp, 'YYYY-MM-DD') AS date, avg(wind_speed) * 1.94384 AS avg_knots
+      SELECT extract(epoch from timestamp::date) * 1000 as date, avg(wind_speed) * 1.94384 AS avg_knots
       FROM readings
-      WHERE EXTRACT(MONTH FROM timestamp) BETWEEN 5 AND 9
-      AND station_id = :station_id
+      WHERE station_id = :station_id
+      AND timestamp >= :start_date
+      AND timestamp <= :end_date
       GROUP BY date
       ORDER BY date
     "
 
-    results = select_rows(sql, station_id: params[:station_id]).map do |row|
-      [row[0], row[1].to_f]
+    values = params.slice(:station_id, :start_date, :end_date)
+    results = select_rows(sql, values).map do |row|
+      [row[0].to_i, row[1].to_f]
     end
     
     render json: results

@@ -1,7 +1,6 @@
 javascript:
   $(document).ready(function() {
-    var div = document.getElementById('container');
-    var app = Elm.embed(Elm.Main, div);
+    startElmApp(#{@elm_data.to_json.html_safe});
   });
 
 #container

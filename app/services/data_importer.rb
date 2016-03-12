@@ -1,8 +1,12 @@
 require 'open-uri'
 
 class DataImporter
-  def self.import
-    open(URI("http://www.glerl.noaa.gov/metdata/chi/archive/chi2015.04t.txt")) do |file|
+  def self.import(station, year)
+    uri = URI::HTTP.build(
+      host: 'www.glerl.noaa.gov',
+      path: "/metdata/#{station.slug}/archive/#{station.slug}#{year}.#{station.id.to_s.rjust(2, '0')}t.txt"
+    )
+    open(uri) do |file|
       inserts = file.map { |row| convert_row_to_sql_insert(row) }.compact
       insert_readings(inserts)
     end
@@ -34,6 +38,8 @@ class DataImporter
       wind_gust: wind_gust,
       wind_direction: wind_direction
     }
+
+    return nil if wind_speed < 0 || wind_gust < 0 || wind_direction < 0
 
     sql = "(:station_id, :timestamp, :air_temp, :wind_speed, :wind_gust, :wind_direction)"
     sanitize(sql, values)

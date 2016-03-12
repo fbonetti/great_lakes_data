@@ -13,4 +13,4 @@
 //= require jquery
 //= require jquery_ujs
 //= require highcharts
-//= require elm
+//= require_tree .
