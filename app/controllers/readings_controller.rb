@@ -4,19 +4,19 @@ class ReadingsController < ApplicationController
       station.attributes.slice('id', 'name', 'latitude', 'longitude')
     end
     @elm_data = {
-      stations: stations,
-      startDate: "2015-01-01",
-      endDate: "2015-12-31"
+      stations: stations
     }
   end
 
   def daily_average
     sql = "
-      SELECT extract(epoch from timestamp::date) * 1000 as date, avg(wind_speed) * 1.94384 AS avg_knots
+      SELECT extract(epoch from (timestamp::timestamp at time zone stations.time_zone)::date) * 1000 as date,
+             avg(wind_speed) * 1.94384 AS avg_knots
       FROM readings
+      JOIN stations ON stations.id = station_id
       WHERE station_id = :station_id
-      AND timestamp >= :start_date
-      AND timestamp <= :end_date
+      AND timestamp >= to_timestamp(:start_date)
+      AND timestamp <= to_timestamp(:end_date)
       GROUP BY date
       ORDER BY date
     "

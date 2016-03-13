@@ -1,6 +1,6 @@
 import StartApp
 import Html exposing (Html, Attribute, div, text, input, select, option, button, span, label)
-import Html.Attributes exposing (class, type', value, selected, id)
+import Html.Attributes exposing (class, type', value, selected, id, step)
 import Html.Events exposing (on, targetValue, onClick)
 import Json.Decode
 import Task exposing (Task)
@@ -22,10 +22,7 @@ app =
     { init = (initModel, requestData initModel)
     , view = view
     , update = update
-    , inputs =
-        [ Signal.map SetStartDate startDate
-        , Signal.map SetEndDate endDate
-        ]
+    , inputs = []
     }
 
 port tasks : Signal (Task Never ())
@@ -37,15 +34,13 @@ port data =
   Signal.map .data app.model
 
 port stations : List Station
-port startDate : Signal String
-port endDate : Signal String
 
 -- MODEL
 
 type alias Model =
   { stationId : Int
-  , startDate : String
-  , endDate : String
+  , startDate : Int
+  , endDate : Int
   , data : List Point
   , loading : Bool
   , errorMessage : Maybe String
@@ -63,8 +58,8 @@ type alias Station =
 initModel : Model
 initModel =
   { stationId = 4
-  , startDate = "2015-01-01"
-  , endDate = "2015-12-31"
+  , startDate = 1422576000
+  , endDate = 1435622400
   , data = []
   , loading = False
   , errorMessage = Nothing
@@ -74,8 +69,8 @@ initModel =
 
 type Action
     = SetStationId Int
-    | SetStartDate String
-    | SetEndDate String
+    | SetStartDate Int
+    | SetEndDate Int
     | ReceiveData (List Point)
     | CloseAlert
     | SetErrorMessage String
@@ -125,8 +120,8 @@ readingsUrl : Model -> String
 readingsUrl model =
   url "/readings/daily_average"
     [ ("station_id", (toString model.stationId))
-    , ("start_date", model.startDate)
-    , ("end_date", model.endDate)
+    , ("start_date", (toString model.startDate))
+    , ("end_date", (toString model.endDate))
     ]
 
 dataDecoder : Json.Decode.Decoder (List Point)
@@ -184,11 +179,18 @@ view address model =
         ]
       , div [ class "form-group" ]
         [ label [] [ text "Start Date" ]
-        , input [ id "startDatePicker", type' "text", class "form-control", value model.startDate ] []
+        , input
+          [ type' "range"
+          , Html.Attributes.min "1422576000"
+          , Html.Attributes.max "1435622400"
+          , step "1000"
+          , onChangeInt address SetStartDate
+          ]
+          []
         ]
       , div [ class "form-group" ]
         [ label [] [ text "End Date" ]
-        , input [ id "endDatePicker", type' "text", class "form-control", value model.endDate ] []
+        , input [ type' "range" ] []
         ]
       ]
     ]

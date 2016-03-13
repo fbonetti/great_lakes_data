@@ -7,41 +7,7 @@ var startElmApp = function(elmData) {
     chart.series[0].setData(data);
   });
 
-  var timestampToDateString = function(date) {
-    var year = date.getFullYear();
-    var month = date.getMonth() + 1;
-    var day = date.getDate();
-
-    if (month < 10) {
-      month = "0" + month;
-    }
-
-    if (day < 10) {
-      day = "0" + day;
-    }
-
-    return [year, month, day].join("-");
-  };
-
-  var startDatePicker = $("#startDatePicker").datepicker({
-    autoclose: true,
-    format: "yyyy-mm-dd"
-  });
-
-  startDatePicker.on("changeDate", function(event) {
-    var date = timestampToDateString(event.date);
-    app.ports.startDate.send(date);
-  });
-
-  var endDatePicker = $("#endDatePicker").datepicker({
-    autoclose: true,
-    format: "yyyy-mm-dd"
-  });
-
-  endDatePicker.on("changeDate", function(event) {
-    var date = timestampToDateString(event.date);
-    app.ports.endDate.send(date);
-  });
+  window.chart = chart;
 };
 
 var createChart = function() {
