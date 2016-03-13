@@ -53,6 +53,8 @@ type alias Station =
   , name : String
   , latitude : Float
   , longitude : Float
+  , minTimestamp : Int
+  , maxTimestamp : Int
   }
 
 initModel : Model
@@ -64,6 +66,18 @@ initModel =
   , loading = False
   , errorMessage = Nothing
   }
+
+currentStation : Model -> Maybe Station
+currentStation model =
+  detect (\station -> station.id == model.stationId) stations
+
+currentStationMinTimestamp : Model -> Int
+currentStationMinTimestamp =
+  currentStation >> Maybe.map .minTimestamp >> Maybe.withDefault 0
+
+currentStationMaxTimestamp : Model -> Int
+currentStationMaxTimestamp =
+  currentStation >> Maybe.map .maxTimestamp >> Maybe.withDefault 0
 
 -- UPDATE
 
@@ -83,11 +97,17 @@ update action model =
       let model' = { model | stationId = id, loading = True }
       in (model', requestData model')
     SetStartDate date ->
-      let model' = { model | startDate = date }
-      in (model', requestData model')
+      let
+        date' = if date <= model.endDate then date else model.endDate
+        model' = { model | startDate = date' }
+      in
+        (model', requestData model')
     SetEndDate date ->
-      let model' = { model | endDate = date }
-      in (model', requestData model')
+      let
+        date' = if date >= model.startDate then date else model.startDate
+        model' = { model | endDate = date' }
+      in
+        (model', requestData model')
     ReceiveData data ->
       noEffects { model | data = data, loading = False }
     CloseAlert ->
@@ -157,6 +177,10 @@ httpErrorToString error =
     Http.UnexpectedPayload message -> message
     Http.BadResponse status message -> message
 
+detect : (a -> Bool) -> List a -> Maybe a
+detect fn =
+  List.filter fn >> List.head
+
 -- VIEW
 
 view : Address Action -> Model -> Html
@@ -181,16 +205,25 @@ view address model =
         [ label [] [ text "Start Date" ]
         , input
           [ type' "range"
-          , Html.Attributes.min "1422576000"
-          , Html.Attributes.max "1435622400"
+          , Html.Attributes.min (currentStationMinTimestamp model |> toString)
+          , Html.Attributes.max (currentStationMaxTimestamp model |> toString)
           , step "1000"
+          , value (toString model.startDate)
           , onChangeInt address SetStartDate
           ]
           []
         ]
       , div [ class "form-group" ]
         [ label [] [ text "End Date" ]
-        , input [ type' "range" ] []
+        , input
+          [ type' "range"
+          , Html.Attributes.min (currentStationMinTimestamp model |> toString)
+          , Html.Attributes.max (currentStationMaxTimestamp model |> toString)
+          , step "1000"
+          , value (toString model.endDate)
+          , onChangeInt address SetEndDate
+          ]
+          []
         ]
       ]
     ]

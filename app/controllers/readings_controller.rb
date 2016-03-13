@@ -2,11 +2,22 @@ class ReadingsController < ApplicationController
   def index
     stations = Station.all.map do |station|
       station.attributes.slice('id', 'name', 'latitude', 'longitude')
+      {
+        id: station.id,
+        name: station.name,
+        latitude: station.latitude,
+        longitude: station.longitude,
+        minTimestamp: station.readings.minimum(:timestamp).to_i,
+        maxTimestamp: station.readings.maximum(:timestamp).to_i
+      }
     end
-    @elm_data = {
-      stations: stations
-    }
+    
+    @elm_data = { stations: stations }
   end
+
+  # def station_data
+  #   daily_average = query_daily_average
+  # end
 
   def daily_average
     sql = "
@@ -25,7 +36,7 @@ class ReadingsController < ApplicationController
     results = select_rows(sql, values).map do |row|
       [row[0].to_i, row[1].to_f]
     end
-    
+
     render json: results
   end
 

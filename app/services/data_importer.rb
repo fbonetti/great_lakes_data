@@ -39,7 +39,7 @@ class DataImporter
       wind_direction: wind_direction
     }
 
-    return nil if wind_speed < 0 || wind_gust < 0 || wind_direction < 0
+    return nil if wind_speed.to_f < 0 || wind_gust.to_f < 0 || wind_direction.to_i < 0
 
     sql = "(:station_id, :timestamp, :air_temp, :wind_speed, :wind_gust, :wind_direction)"
     sanitize(sql, values)
