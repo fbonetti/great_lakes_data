@@ -9,12 +9,13 @@ var startElmApp = function(elmData) {
   });
 
   app.ports.windRoseData.subscribe(function(data) {
-    windRoseChart.series[0].setData(data[0]);
-    windRoseChart.series[1].setData(data[1]);
-    windRoseChart.series[2].setData(data[2]);
-    windRoseChart.series[3].setData(data[3]);
-    windRoseChart.series[4].setData(data[4]);
-    windRoseChart.series[5].setData(data[5]);
+    windRoseChart.series[0].setData(data[0], false);
+    windRoseChart.series[1].setData(data[1], false);
+    windRoseChart.series[2].setData(data[2], false);
+    windRoseChart.series[3].setData(data[3], false);
+    windRoseChart.series[4].setData(data[4], false);
+    windRoseChart.series[5].setData(data[5], false);
+    windRoseChart.redraw();
   });
 };
 
