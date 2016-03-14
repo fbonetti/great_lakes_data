@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
   resources :readings, only: [:index] do
     collection do
-      get :daily_average
+      get :station_data
     end
   end
 end

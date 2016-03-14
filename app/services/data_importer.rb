@@ -2,10 +2,18 @@ require 'open-uri'
 
 class DataImporter
   def self.import(station, year)
+    # Alpena has a different path for some reason
+    if station.id == 6
+      station_id = 'c6'
+    else
+      station_id = station.id.to_s.rjust(2, '0')
+    end
+
     uri = URI::HTTP.build(
       host: 'www.glerl.noaa.gov',
-      path: "/metdata/#{station.slug}/archive/#{station.slug}#{year}.#{station.id.to_s.rjust(2, '0')}t.txt"
+      path: "/metdata/#{station.slug}/archive/#{station.slug}#{year}.#{station_id}t.txt"
     )
+
     open(uri) do |file|
       inserts = file.map { |row| convert_row_to_sql_insert(row) }.compact
       insert_readings(inserts)
