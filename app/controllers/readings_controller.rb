@@ -37,8 +37,9 @@ class ReadingsController < ApplicationController
   end
 
   def query_daily_average_data
+    # SELECT extract(epoch from (timestamp::timestamp at time zone stations.time_zone)::date) * 1000 as date,
     sql = "
-      SELECT extract(epoch from (timestamp::timestamp at time zone stations.time_zone)::date) * 1000 as date,
+      SELECT extract(epoch from timestamp::date) * 1000 as date,
              avg(wind_speed) * 1.94384 AS avg_knots
       FROM readings
       JOIN stations ON stations.id = station_id
