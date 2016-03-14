@@ -14,7 +14,6 @@ var startElmApp = function(elmData) {
     windRoseChart.series[2].setData(data[2], false);
     windRoseChart.series[3].setData(data[3], false);
     windRoseChart.series[4].setData(data[4], false);
-    windRoseChart.series[5].setData(data[5], false);
     windRoseChart.redraw();
   });
 };
@@ -66,8 +65,7 @@ var initWindRoseChart = function() {
       { name: '5 - 10', data: [] },
       { name: '10 - 15', data: [] },
       { name: '15 - 20', data: [] },
-      { name: '20 - 25', data: [] },
-      { name: '> 25', data: [] },
+      { name: '> 20', data: [] },
     ],
 
     chart: {

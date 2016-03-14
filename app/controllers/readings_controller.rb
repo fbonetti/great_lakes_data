@@ -71,8 +71,7 @@ class ReadingsController < ApplicationController
         COUNT(CASE WHEN (wind_speed * 1.94384) BETWEEN 5 AND 10 THEN TRUE ELSE NULL END)::float / :total * 100,
         COUNT(CASE WHEN (wind_speed * 1.94384) BETWEEN 10 AND 15 THEN TRUE ELSE NULL END)::float / :total * 100,
         COUNT(CASE WHEN (wind_speed * 1.94384) BETWEEN 15 AND 20 THEN TRUE ELSE NULL END)::float / :total * 100,
-        COUNT(CASE WHEN (wind_speed * 1.94384) BETWEEN 20 AND 25 THEN TRUE ELSE NULL END)::float / :total * 100,
-        COUNT(CASE WHEN (wind_speed * 1.94384) > 25 THEN TRUE ELSE NULL END)::float / :total * 100
+        COUNT(CASE WHEN (wind_speed * 1.94384) > 20 THEN TRUE ELSE NULL END)::float / :total * 100
       FROM readings
       WHERE station_id = :station_id
       AND timestamp BETWEEN to_timestamp(:start_date) AND to_timestamp(:end_date)
